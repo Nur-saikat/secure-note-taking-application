@@ -1,0 +1,13 @@
+# .NET build output and IDE state
+[Bb]in/
+[Oo]bj/
+.vs/
+*.user
+Publish/
+
+# Logs
+*.log
+
+# Local configuration containing real credentials
+appsettings.json
+appsettings.Development.json
