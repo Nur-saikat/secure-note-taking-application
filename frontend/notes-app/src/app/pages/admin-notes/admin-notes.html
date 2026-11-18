@@ -1,0 +1,82 @@
+<div class="page">
+  <header class="page-head">
+    <div>
+      <p class="eyebrow">Administration &middot; archive</p>
+      <h1>All notes</h1>
+      <p class="page-sub">Every private note in the workspace, newest first. Admin access is read-only from this view.</p>
+    </div>
+    <div class="head-stat" aria-label="{{ total() }} notes">
+      <span class="stat-number">{{ total() }}</span>
+      <span class="stat-label">notes</span>
+    </div>
+  </header>
+
+  @if (error()) {
+    <div class="alert error" role="alert">{{ error() }}</div>
+  }
+
+  <section class="card table-card">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Every document</p>
+        <h2>Notes across the workspace</h2>
+      </div>
+      <span class="chip neutral">{{ total() }} total</span>
+    </div>
+
+    @if (loading()) {
+      <div class="table-loading">
+        <div class="loading-state">Loading notes...</div>
+      </div>
+    } @else if (notes().length === 0) {
+      <div class="table-loading">
+        <div class="empty-state compact">
+          <h3>No notes exist yet.</h3>
+          <p>When users start writing, their notes will appear here.</p>
+        </div>
+      </div>
+    } @else {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Owner</th>
+              <th>Updated</th>
+              <th>Content</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (note of notes(); track note.id) {
+              <tr>
+                <td>
+                  <strong class="note-title-cell">{{ note.title }}</strong>
+                </td>
+                <td>
+                  <span class="owner-tag">
+                    <span class="member-dot" aria-hidden="true">{{ note.ownerUsername.slice(0, 2) }}</span>
+                    &#64;{{ note.ownerUsername }}
+                  </span>
+                </td>
+                <td class="muted small">{{ note.updatedAt | date: 'MMM d, y · h:mm a' }}</td>
+                <td>
+                  <details>
+                    <summary class="disclosure">Read note</summary>
+                    <div class="detail-content">{{ note.content }}</div>
+                  </details>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <app-pagination
+        [page]="page()"
+        [totalPages]="totalPages()"
+        [total]="total()"
+        (pageChange)="goPage($event)"
+      />
+    }
+  </section>
+</div>

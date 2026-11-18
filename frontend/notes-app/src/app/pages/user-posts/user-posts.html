@@ -1,0 +1,73 @@
+<div class="page">
+  <header class="page-head">
+    <div>
+      <p class="eyebrow">Community &middot; profile</p>
+      <h1>
+        @if (data(); as view) {
+          &#64;{{ view.username }}
+        } @else {
+          User posts
+        }
+      </h1>
+      <p class="page-sub">Their public posts, newest first.</p>
+    </div>
+    <a class="back-link" routerLink="/posts">&larr; All posts</a>
+  </header>
+
+  @if (error()) {
+    <div class="alert error" role="alert">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <div class="card">
+      <div class="loading-state">Loading profile...</div>
+    </div>
+  } @else if (data(); as view) {
+    <section class="card feed-card">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Public feed</p>
+          <h2>Posts by this author</h2>
+        </div>
+        <span class="chip neutral">{{ view.total }} {{ view.total === 1 ? 'post' : 'posts' }}</span>
+      </div>
+
+      @if (view.items.length === 0) {
+        <div class="feed-list">
+          <div class="empty-state compact">
+            <span class="empty-glyph" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 5.5h16v10H9l-5 4z" />
+                <path d="M8 9.5h8M8 12.5h5" />
+              </svg>
+            </span>
+            <h3>Nothing published yet.</h3>
+            <p>This user has not written any public posts.</p>
+          </div>
+        </div>
+      } @else {
+        <div class="feed-list">
+          @for (post of view.items; track post.id) {
+            <article class="feed-item">
+              <span class="feed-avatar" aria-hidden="true">{{ view.username.slice(0, 2) }}</span>
+              <div class="feed-body">
+                <div class="feed-head">
+                  <span class="feed-author">&#64;{{ view.username }}</span>
+                  <time class="feed-time" [attr.datetime]="post.createdAt">{{ post.createdAt | date: 'MMM d, y · h:mm a' }}</time>
+                </div>
+                <p class="post-content">{{ post.content }}</p>
+              </div>
+            </article>
+          }
+        </div>
+
+        <app-pagination
+          [page]="view.page"
+          [totalPages]="view.totalPages"
+          [total]="view.total"
+          (pageChange)="goPage($event)"
+        />
+      }
+    </section>
+  }
+</div>

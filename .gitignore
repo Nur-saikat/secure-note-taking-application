@@ -1,0 +1,24 @@
+# .NET build output and IDE state
+[Bb]in/
+[Oo]bj/
+.vs/
+*.user
+backend/Publish/
+backend/New folder/
+
+# Logs
+*.log
+
+# Local configuration containing real credentials
+backend/NotesApi/appsettings.json
+backend/NotesApi/appsettings.Development.json
+
+# Node / Angular
+node_modules/
+dist/
+.angular/
+coverage/
+
+# OS noise
+Thumbs.db
+.DS_Store

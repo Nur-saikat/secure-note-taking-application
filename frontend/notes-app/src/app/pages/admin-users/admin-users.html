@@ -1,0 +1,197 @@
+<div class="page">
+  <header class="page-head">
+    <div>
+      <p class="eyebrow">Administration &middot; directory</p>
+      <h1>People</h1>
+      <p class="page-sub">Add, edit, remove and browse accounts. The list is sorted by username and backed by an index.</p>
+    </div>
+    <div class="head-stat" aria-label="{{ total() }} accounts">
+      <span class="stat-number">{{ total() }}</span>
+      <span class="stat-label">accounts</span>
+    </div>
+  </header>
+
+  @if (error()) {
+    <div class="alert error" role="alert">{{ error() }}</div>
+  }
+  @if (notice()) {
+    <div class="alert success">{{ notice() }}</div>
+  }
+
+  <section class="card composer">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">{{ editingId() ? 'Editing account' : 'Add someone' }}</p>
+        <h2>{{ editingId() ? 'Update this account' : 'Create a new account' }}</h2>
+      </div>
+      <span class="chip">{{ editingId() ? 'Edit mode' : 'Admin only' }}</span>
+    </div>
+
+    <form #userForm="ngForm" (ngSubmit)="save(userForm)">
+      <div class="form-grid">
+        <div class="field">
+          <label for="new-username">Username</label>
+          <input
+            id="new-username"
+            name="username"
+            [(ngModel)]="draft.username"
+            required
+            minlength="3"
+            maxlength="30"
+            pattern="[A-Za-z0-9_.-]+"
+            placeholder="e.g. ada_lovelace"
+          />
+        </div>
+
+        <div class="field">
+          <label for="new-email">Email</label>
+          <input
+            id="new-email"
+            name="email"
+            type="email"
+            [(ngModel)]="draft.email"
+            required
+            maxlength="254"
+            placeholder="name@example.com"
+          />
+        </div>
+
+        <div class="field">
+          <label for="new-role">Role</label>
+          <select id="new-role" name="role" [(ngModel)]="draft.role" [disabled]="editingId() === currentUserId">
+            <option value="User">User</option>
+            <option value="Admin">Admin</option>
+          </select>
+          @if (editingId() === currentUserId) {
+            <span class="muted small">You cannot change your own role.</span>
+          }
+        </div>
+
+        <div class="field">
+          <label for="new-password">{{ editingId() ? 'New password (optional)' : 'Password' }}</label>
+          <input
+            id="new-password"
+            name="password"
+            type="password"
+            [(ngModel)]="draft.password"
+            [required]="!editingId()"
+            minlength="8"
+            maxlength="72"
+            autocomplete="new-password"
+            [placeholder]="editingId() ? 'Leave blank to keep the current password' : 'At least 8 characters'"
+          />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="new-interests">Interests</label>
+        <input
+          id="new-interests"
+          name="interests"
+          [(ngModel)]="draft.interests"
+          placeholder="chess, reading, security"
+        />
+        <span class="muted small">Comma-separated, up to 20.</span>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" [disabled]="userForm.invalid || saving()">
+          {{ saving() ? 'Saving...' : editingId() ? 'Save changes' : 'Create account' }}
+        </button>
+        @if (editingId()) {
+          <button type="button" class="secondary" (click)="cancelEdit()">Discard changes</button>
+        }
+        <span class="form-note">Passwords hashed with BCrypt</span>
+      </div>
+    </form>
+  </section>
+
+  <section class="card table-card">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Directory</p>
+        <h2>All accounts</h2>
+      </div>
+      <span class="chip neutral">{{ total() }} accounts</span>
+    </div>
+
+    @if (loading()) {
+      <div class="table-loading">
+        <div class="loading-state">Loading accounts...</div>
+      </div>
+    } @else if (users().length === 0) {
+      <div class="table-loading">
+        <div class="empty-state compact">
+          <h3>No accounts yet.</h3>
+          <p>Create the first account with the form above.</p>
+        </div>
+      </div>
+    } @else {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Account</th>
+              <th>Role</th>
+              <th>Interests</th>
+              <th>Joined</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of users(); track user.id) {
+              <tr>
+                <td>
+                  <div class="person-cell">
+                    <span class="avatar" aria-hidden="true">{{ user.username.slice(0, 2) }}</span>
+                    <div class="person-copy">
+                      <strong>{{ user.username }}</strong>
+                      <span>{{ user.email }}</span>
+                    </div>
+                    @if (user.id === currentUserId) {
+                      <span class="role-badge">you</span>
+                    }
+                  </div>
+                </td>
+                <td>
+                  <span class="role-badge" [class.admin]="user.role === 'Admin'">{{ user.role }}</span>
+                </td>
+                <td>
+                  @if (user.interests.length > 0) {
+                    <div class="pill-list">
+                      @for (interest of user.interests; track interest) {
+                        <span class="pill">{{ interest }}</span>
+                      }
+                    </div>
+                  } @else {
+                    <span class="muted small">&mdash;</span>
+                  }
+                </td>
+                <td class="muted small">{{ user.createdAt | date: 'MMM d, y' }}</td>
+                <td class="actions">
+                  <button type="button" class="table-action" (click)="startEdit(user)">Edit</button>
+                  <button
+                    type="button"
+                    class="table-action danger"
+                    [disabled]="user.id === currentUserId"
+                    [title]="user.id === currentUserId ? 'You cannot delete your own account.' : ''"
+                    (click)="remove(user)"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <app-pagination
+        [page]="page()"
+        [totalPages]="totalPages()"
+        [total]="total()"
+        (pageChange)="goPage($event)"
+      />
+    }
+  </section>
+</div>

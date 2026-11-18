@@ -1,0 +1,60 @@
+<div class="page">
+  <header class="page-head">
+    <div>
+      <p class="eyebrow">Administration &middot; signals</p>
+      <h1>Interest map</h1>
+      <p class="page-sub">Users grouped by shared interests, counted in a single aggregation pipeline.</p>
+    </div>
+    <div class="head-stat" aria-label="{{ total() }} interest groups">
+      <span class="stat-number">{{ total() }}</span>
+      <span class="stat-label">interests</span>
+    </div>
+  </header>
+
+  @if (error()) {
+    <div class="alert error" role="alert">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <div class="card">
+      <div class="loading-state">Mapping interests...</div>
+    </div>
+  } @else if (groups().length === 0) {
+    <div class="empty-state">
+      <span class="empty-glyph" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4h7l9 9-7 7-9-9z" />
+          <circle cx="8.5" cy="8.5" r="1.2" />
+        </svg>
+      </span>
+      <h3>No shared interests yet.</h3>
+      <p>Interests appear once users add them to their profiles.</p>
+    </div>
+  } @else {
+    <section class="interest-grid">
+      @for (group of groups(); track group.interest) {
+        <article class="interest-card">
+          <div class="interest-head">
+            <span class="chip neutral">{{ group.count }} {{ group.count === 1 ? 'member' : 'members' }}</span>
+          </div>
+          <h2>{{ group.interest }}</h2>
+          <div class="member-list">
+            @for (user of group.users; track user.id) {
+              <a [routerLink]="['/users', user.id, 'posts']">
+                <span class="member-dot" aria-hidden="true">{{ user.username.slice(0, 2) }}</span>
+                &#64;{{ user.username }}
+              </a>
+            }
+          </div>
+        </article>
+      }
+    </section>
+
+    <app-pagination
+      [page]="page()"
+      [totalPages]="totalPages()"
+      [total]="total()"
+      (pageChange)="goPage($event)"
+    />
+  }
+</div>

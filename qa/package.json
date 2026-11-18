@@ -1,0 +1,11 @@
+{
+  "name": "secure-notes-qa",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "smoke": "node api-smoke.mjs"
+  },
+  "dependencies": {
+    "mongodb": "^6.21.0"
+  }
+}

@@ -1,0 +1,11 @@
+namespace NotesApi.Configuration;
+
+public sealed class SeedAdminOptions
+{
+    public const string SectionName = "SeedAdmin";
+
+    public string Username { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
+    public List<string> Interests { get; set; } = new();
+}

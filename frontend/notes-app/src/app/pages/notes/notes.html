@@ -1,0 +1,119 @@
+<div class="page">
+  <header class="page-head">
+    <div>
+      <p class="eyebrow">Workspace &middot; private</p>
+      <h1>My notes</h1>
+      <p class="page-sub">A quiet place for ideas that are only yours. Everything here is scoped to your account.</p>
+    </div>
+    <div class="head-stat" aria-label="{{ total() }} notes">
+      <span class="stat-number">{{ total() }}</span>
+      <span class="stat-label">notes</span>
+    </div>
+  </header>
+
+  @if (error()) {
+    <div class="alert error" role="alert">{{ error() }}</div>
+  }
+  @if (notice()) {
+    <div class="alert success">{{ notice() }}</div>
+  }
+
+  <section class="card composer">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">{{ editingId() ? 'Editing' : 'Quick capture' }}</p>
+        <h2>{{ editingId() ? 'Rewrite this note' : 'Start a new note' }}</h2>
+      </div>
+      <span class="chip">{{ editingId() ? 'Edit mode' : 'New' }}</span>
+    </div>
+
+    <form #noteForm="ngForm" (ngSubmit)="submit(noteForm)">
+      <div class="field">
+        <label for="title">Title</label>
+        <input
+          id="title"
+          name="title"
+          [(ngModel)]="draft.title"
+          required
+          maxlength="200"
+          placeholder="Give the thought a name"
+        />
+      </div>
+
+      <div class="field">
+        <label for="content">Content</label>
+        <textarea
+          id="content"
+          name="content"
+          [(ngModel)]="draft.content"
+          required
+          maxlength="10000"
+          rows="6"
+          placeholder="Write freely. No one else can read this."
+        ></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" [disabled]="noteForm.invalid || saving()">
+          {{ saving() ? 'Saving...' : editingId() ? 'Save changes' : 'Create note' }}
+        </button>
+        @if (editingId()) {
+          <button type="button" class="secondary" (click)="cancelEdit()">Discard changes</button>
+        }
+        <span class="form-note">{{ draft.content.length }} / 10000</span>
+      </div>
+    </form>
+  </section>
+
+  <section class="stack">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Archive</p>
+        <h2>Recent notes</h2>
+      </div>
+      <span class="chip neutral">Newest first</span>
+    </div>
+
+    @if (loading()) {
+      <div class="card">
+        <div class="loading-state">Gathering your notes...</div>
+      </div>
+    } @else if (notes().length === 0) {
+      <div class="empty-state">
+        <span class="empty-glyph" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 3.5h8L18 8v12.5H6z" />
+            <path d="M14 3.5V8h4M9 12.5h6M9 16h4" />
+          </svg>
+        </span>
+        <h3>Blank page, for now.</h3>
+        <p>Capture your first thought with the composer above.</p>
+      </div>
+    } @else {
+      <div class="note-grid">
+        @for (note of notes(); track note.id) {
+          <article class="note-card">
+            <div class="note-meta">
+              <span>Updated {{ note.updatedAt | date: 'MMM d' }}</span>
+              <span class="dot-sep"></span>
+              <span>{{ note.content.length }} chars</span>
+            </div>
+            <h3>{{ note.title }}</h3>
+            <p class="note-content">{{ note.content }}</p>
+            <div class="note-actions">
+              <button type="button" class="text-button" (click)="edit(note)">Edit</button>
+              <button type="button" class="text-button danger-text" (click)="remove(note)">Delete</button>
+            </div>
+          </article>
+        }
+      </div>
+
+      <app-pagination
+        [page]="page()"
+        [totalPages]="totalPages()"
+        [total]="total()"
+        (pageChange)="goPage($event)"
+      />
+    }
+  </section>
+</div>

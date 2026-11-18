@@ -1,0 +1,95 @@
+<div class="auth-page">
+  <section class="auth-visual">
+    <a class="brand" routerLink="/posts">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 3.5h8L18 8v12.5H6z" />
+          <path d="M14 3.5V8h4M9 12.5h6M9 16h4" />
+        </svg>
+      </span>
+      <span class="brand-text">
+        Secure Notes
+        <small>private workspace</small>
+      </span>
+    </a>
+
+    <div class="auth-hero">
+      <p class="eyebrow">Private workspace</p>
+      <h1>Keep the good ideas. <em>Keep them yours.</em></h1>
+      <p class="auth-lede">
+        A calm home for the thoughts that are not ready for the commons. Private notes, public posts,
+        one place to think.
+      </p>
+      <ul class="auth-points">
+        <li>Notes stay scoped to your account</li>
+        <li>Share only what you choose to publish</li>
+        <li>Interests connect you with the rest of the workspace</li>
+      </ul>
+    </div>
+
+    <div class="auth-visual-foot">
+      <span>JWT &middot; BCrypt &middot; MongoDB</span>
+      <a routerLink="/posts">Browse public posts &rarr;</a>
+    </div>
+  </section>
+
+  <section class="auth-panel">
+    <div class="auth-panel-inner">
+      <p class="eyebrow">Welcome back</p>
+      <h2>Log in to your notes</h2>
+      <p class="auth-sub">Your private pages are waiting where you left them.</p>
+
+      @if (expired) {
+        <div class="alert error">Your session has expired or your account changed. Please log in again.</div>
+      }
+
+      @if (error()) {
+        <div class="alert error" role="alert">{{ error() }}</div>
+      }
+
+      <form #loginForm="ngForm" (ngSubmit)="submit(loginForm)">
+        <div class="field">
+          <label for="username">Username</label>
+          <input
+            id="username"
+            name="username"
+            [(ngModel)]="model.username"
+            required
+            minlength="3"
+            maxlength="30"
+            autocomplete="username"
+            placeholder="Your username"
+          />
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            [(ngModel)]="model.password"
+            required
+            autocomplete="current-password"
+            placeholder="Your password"
+          />
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="auth-submit" [disabled]="loginForm.invalid || loading()">
+            {{ loading() ? 'Logging in...' : 'Log in' }}
+          </button>
+        </div>
+      </form>
+
+      <p class="auth-switch">New to Secure Notes? <a routerLink="/register">Create an account</a></p>
+
+      @if (demoCredentials) {
+        <div class="demo-card">
+          <span class="chip">Demo</span>
+          <span>Use <code>admin</code> / <code>Admin#12345</code> to explore the admin view.</span>
+        </div>
+      }
+    </div>
+  </section>
+</div>

@@ -1,0 +1,128 @@
+<div class="auth-page">
+  <section class="auth-visual">
+    <a class="brand" routerLink="/posts">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 3.5h8L18 8v12.5H6z" />
+          <path d="M14 3.5V8h4M9 12.5h6M9 16h4" />
+        </svg>
+      </span>
+      <span class="brand-text">
+        Secure Notes
+        <small>private workspace</small>
+      </span>
+    </a>
+
+    <div class="auth-hero">
+      <p class="eyebrow">Join the workspace</p>
+      <h1>A quieter place for <em>your ideas.</em></h1>
+      <p class="auth-lede">
+        Start with a blank page. Write privately, publish when it feels right, and find people who
+        care about the same things.
+      </p>
+      <ul class="auth-points">
+        <li>Private notes from the first moment</li>
+        <li>A public feed whenever you want to share</li>
+        <li>Interests that surface your corner of the workspace</li>
+      </ul>
+    </div>
+
+    <div class="auth-visual-foot">
+      <span>JWT &middot; BCrypt &middot; MongoDB</span>
+      <a routerLink="/posts">Browse public posts &rarr;</a>
+    </div>
+  </section>
+
+  <section class="auth-panel">
+    <div class="auth-panel-inner">
+      <p class="eyebrow">Get started</p>
+      <h2>Create your account</h2>
+      <p class="auth-sub">New accounts receive the User role. Admins are managed separately.</p>
+
+      @if (error()) {
+        <div class="alert error" role="alert">{{ error() }}</div>
+      }
+
+      <form #registerForm="ngForm" (ngSubmit)="submit(registerForm)">
+        <div class="field">
+          <label for="username">Username</label>
+          <input
+            id="username"
+            name="username"
+            [(ngModel)]="model.username"
+            required
+            minlength="3"
+            maxlength="30"
+            pattern="[A-Za-z0-9_.-]+"
+            autocomplete="username"
+            placeholder="e.g. ada_lovelace"
+          />
+          <span class="muted small">3-30 characters: letters, numbers, dot, underscore, hyphen.</span>
+        </div>
+
+        <div class="field">
+          <label for="email">Email</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            [(ngModel)]="model.email"
+            required
+            maxlength="254"
+            autocomplete="email"
+            placeholder="name@example.com"
+          />
+        </div>
+
+        <div class="form-grid">
+          <div class="field">
+            <label for="password">Password</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              [(ngModel)]="model.password"
+              required
+              minlength="8"
+              maxlength="72"
+              autocomplete="new-password"
+              placeholder="At least 8 characters"
+            />
+          </div>
+
+          <div class="field">
+            <label for="confirm">Confirm password</label>
+            <input
+              id="confirm"
+              name="confirm"
+              type="password"
+              [(ngModel)]="model.confirm"
+              required
+              autocomplete="new-password"
+              placeholder="Repeat it"
+            />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="interests">Interests</label>
+          <input
+            id="interests"
+            name="interests"
+            [(ngModel)]="model.interests"
+            placeholder="chess, reading, security"
+          />
+          <span class="muted small">Comma-separated, up to 20.</span>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="auth-submit" [disabled]="registerForm.invalid || loading()">
+            {{ loading() ? 'Creating account...' : 'Create account' }}
+          </button>
+        </div>
+      </form>
+
+      <p class="auth-switch">Already have an account? <a routerLink="/login">Log in</a></p>
+    </div>
+  </section>
+</div>

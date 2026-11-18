@@ -1,0 +1,122 @@
+<div class="page">
+  <header class="page-head">
+    <div>
+      <p class="eyebrow">Community &middot; public</p>
+      <h1>The commons</h1>
+      <p class="page-sub">Ideas worth sharing, from everyone in the workspace. Read freely; add your voice when you sign in.</p>
+    </div>
+    <div class="head-stat" aria-label="{{ total() }} posts">
+      <span class="stat-number">{{ total() }}</span>
+      <span class="stat-label">posts</span>
+    </div>
+  </header>
+
+  @if (error()) {
+    <div class="alert error" role="alert">{{ error() }}</div>
+  }
+  @if (notice()) {
+    <div class="alert success">{{ notice() }}</div>
+  }
+
+  <div class="posts-layout">
+    @if (auth.isLoggedIn()) {
+      <section class="card composer composer-side">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">New post</p>
+            <h2>Share an idea</h2>
+          </div>
+          <span class="chip">Public</span>
+        </div>
+        <p class="composer-copy">Published under your username and visible to everyone, signed in or not.</p>
+
+        <form #postForm="ngForm" (ngSubmit)="submit(postForm)">
+          <div class="field">
+            <label for="post-content">Content</label>
+            <textarea
+              id="post-content"
+              name="content"
+              [(ngModel)]="draft.content"
+              required
+              maxlength="2000"
+              rows="5"
+              placeholder="What is on your mind?"
+            ></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="submit" [disabled]="postForm.invalid || creating()">
+              {{ creating() ? 'Publishing...' : 'Publish post' }}
+            </button>
+            <span class="char-count">{{ draft.content.length }} / 2000</span>
+          </div>
+        </form>
+      </section>
+    } @else {
+      <section class="card composer composer-side invite-card">
+        <div>
+          <p class="eyebrow">Open feed</p>
+          <h2>Reading the commons</h2>
+        </div>
+        <p class="composer-copy">
+          Anyone can read these posts. Log in to keep private notes and publish your own ideas.
+        </p>
+        <div class="invite-actions">
+          <a class="button-link" routerLink="/login">Log in</a>
+          <a class="back-link" routerLink="/register">Create account</a>
+        </div>
+      </section>
+    }
+
+    <section class="card feed-card">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Public feed</p>
+          <h2>Latest posts</h2>
+        </div>
+        <span class="chip neutral">{{ total() }} {{ total() === 1 ? 'post' : 'posts' }}</span>
+      </div>
+
+      @if (loading()) {
+        <div class="feed-list">
+          <div class="loading-state">Loading the feed...</div>
+        </div>
+      } @else if (posts().length === 0) {
+        <div class="feed-list">
+          <div class="empty-state compact">
+            <span class="empty-glyph" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 5.5h16v10H9l-5 4z" />
+                <path d="M8 9.5h8M8 12.5h5" />
+              </svg>
+            </span>
+            <h3>The feed is quiet.</h3>
+            <p>Be the first to publish something.</p>
+          </div>
+        </div>
+      } @else {
+        <div class="feed-list">
+          @for (post of posts(); track post.id) {
+            <article class="feed-item">
+              <span class="feed-avatar" aria-hidden="true">{{ post.authorUsername.slice(0, 2) }}</span>
+              <div class="feed-body">
+                <div class="feed-head">
+                  <a [routerLink]="['/users', post.userId, 'posts']">&#64;{{ post.authorUsername }}</a>
+                  <time class="feed-time" [attr.datetime]="post.createdAt">{{ post.createdAt | date: 'MMM d, y · h:mm a' }}</time>
+                </div>
+                <p class="post-content">{{ post.content }}</p>
+                <a class="feed-link" [routerLink]="['/users', post.userId, 'posts']">View profile &rarr;</a>
+              </div>
+            </article>
+          }
+        </div>
+
+        <app-pagination
+          [page]="page()"
+          [totalPages]="totalPages()"
+          [total]="total()"
+          (pageChange)="goPage($event)"
+        />
+      }
+    </section>
+  </div>
+</div>
